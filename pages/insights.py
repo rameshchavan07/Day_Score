@@ -4,10 +4,11 @@ import pandas as pd
 def show(db):
     st.header("📊 Your Insights")
     
-    if db:
+    if db and st.session_state.user_id:
         try:
+            user_id = st.session_state.user_id
             docs = db.collection("dayscores") \
-                .where("user_id", "==", "shivani_demo") \
+                .where("user_id", "==", user_id) \
                 .stream()
 
             records = []
@@ -33,4 +34,4 @@ def show(db):
         except Exception as e:
             st.error(f"Error loading data: {e}")
     else:
-        st.warning("Firebase not connected")
+        st.warning("Please log in to view your insights")

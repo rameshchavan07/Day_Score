@@ -10,9 +10,9 @@ def show(db):
     </div>
     """, unsafe_allow_html=True)
 
-    if db:
+    if db and st.session_state.user_id:
         try:
-            user_id = "shivani_demo"
+            user_id = st.session_state.user_id
             today_doc = db.collection("dayscores").document(f"{user_id}_{date.today()}").get()
             
             if today_doc.exists:
@@ -65,4 +65,4 @@ def show(db):
         except Exception as e:
             st.error(f"Error loading results: {e}")
     else:
-        st.warning("Firebase not connected")
+        st.warning("Please log in to view your results")

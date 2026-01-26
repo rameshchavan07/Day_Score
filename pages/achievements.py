@@ -36,3 +36,28 @@ def show(db):
             <p style='font-size: 0.9em; color: #666;'>Study 50+ hours</p>
         </div>
         """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    st.subheader("🎯 Your Progress")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        <div style='background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
+            <h3>🌙 Sleep Champion</h3>
+            <p style='color: #999;'>Locked</p>
+            <p style='font-size: 0.9em;'>Get 8+ hours of sleep for 7 consecutive days</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div style='background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
+            <h3>📚 Bookworm</h3>
+            <p style='color: #999;'>Locked</p>
+            <p style='font-size: 0.9em;'>Complete 10 study sessions</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.info("💡 Keep checking in daily to unlock more achievements!")
