@@ -37,15 +37,15 @@ htmlcov/
 Thumbs.db
 
 # =========================
-# Firebase (IMPORTANT 🔐)
+# Firebase / Google Cloud 🔐
 # =========================
 
-# Firebase Admin SDK keys
-*firebase-adminsdk*.json
+# Service account & admin SDK keys
 serviceAccountKey.json
+*firebase-adminsdk*.json
 firebase-key.json
 
-# Firebase config files (if generated locally)
+# Firebase local files
 .firebase/
 firebase-debug.log
 
@@ -53,3 +53,5 @@ firebase-debug.log
 # Logs
 # =========================
 *.log
+git add .gitignore
+git commit -m "Fix .gitignore for Firebase security"
