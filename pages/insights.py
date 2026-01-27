@@ -2,8 +2,7 @@ import streamlit as st
 import pandas as pd
 
 def show(db):
-    st.header("📊 Your Insights")
-    
+    st.title("💡 Insights")
     if db and st.session_state.user_id:
         try:
             user_id = st.session_state.user_id

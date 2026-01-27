@@ -1,7 +1,9 @@
 import streamlit as st
 import time
 
+
 def show(db):
+    st.title("🌬️ Breathing")
     """
     LEVEL 4: Breathing Exercise Experience
     Guided breathing exercises for stress reduction

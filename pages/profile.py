@@ -1,6 +1,7 @@
 import streamlit as st
 
 def show(db):
+    st.title("👤 Profile")
     st.markdown("""
     <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; border-radius: 10px; color: white; margin-bottom: 30px;'>
         <h1 style='margin: 0; color: white;'>👤 Your Profile</h1>

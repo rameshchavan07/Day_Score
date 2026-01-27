@@ -5,6 +5,8 @@ import plotly.graph_objects as go
 import plotly.express as px
 
 def show(db):
+    st.title("📈 Analytics")
+    st.write("Your wellness trends")
     """
     LEVEL 3: Analytics Dashboard with Weekly Charts
     Track wellness trends over time with visualizations

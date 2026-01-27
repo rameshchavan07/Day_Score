@@ -9,7 +9,7 @@ def is_valid_email(email):
     return re.match(pattern, email)
 
 def show():
-    st.set_page_config(page_title="Login - DayScore+", layout="centered")
+    
     
     st.markdown("""
     <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 60px 20px; border-radius: 15px; text-align: center; color: white; margin-bottom: 30px;'>
@@ -52,7 +52,12 @@ def show():
                         st.session_state.logged_in = True
                         
                         st.success("✅ Login successful!")
+                
                         st.balloons()
+                        st.session_state.logged_in = True
+                        st.session_state.just_logged_in = True
+                        st.rerun()
+
                         
                         import time
                         time.sleep(1)
