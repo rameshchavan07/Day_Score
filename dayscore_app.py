@@ -2,6 +2,9 @@ import streamlit as st
 import pickle
 import pandas as pd
 from firebase_config import db
+from pages.community_challenges import show as community_challenges_page
+import pages.relaxation_engine as relaxation_engine
+
 
 # Initialize session state
 if "logged_in" not in st.session_state:
@@ -125,7 +128,7 @@ else:
         
         page = st.radio(
             "Select Page:",
-            ["🏠 Landing", "📝 Check-In", "📊 Results", "📈 Analytics", "🏆 Achievements", "🌬️ Breathing", "🎮 Games", "💡 Insights", "👤 Profile" , "💬 HealthBot"],
+            ["🏠 Landing", "📝 Check-In", "📊 Results", "📈 Analytics", "🏆 Achievements", "🌬️ Breathing", "🎮 Games", "💡 Insights", "👤 Profile" , "💬 HealthBot", "🌍 Community Challenges", "🧘 Relaxation"],
             key="page_nav",
             label_visibility="collapsed"
         )
@@ -172,7 +175,12 @@ else:
             show(db)
         elif "HealthBot" in page:
             from pages.chatbot import show
-            show(db)    
+            show(db)
+        elif "Community Challenges" in page:
+          community_challenges_page(db)
+        elif"Relaxation" in page: 
+            relaxation_engine.show(db)
+
     except Exception as e:
         st.error(f"❌ Error loading page: {str(e)}")
         import traceback
