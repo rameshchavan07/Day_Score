@@ -177,11 +177,27 @@ else:
             from pages.chatbot import show
             show(db)
         elif "Community Challenges" in page:
-          community_challenges_page(db)
-        elif"Relaxation" in page: 
-            relaxation_engine.show(db)
+            community_challenges_page(db)
+        elif "Relaxation" in page:
+            try:
+                # Fetch user stress score from Firebase
+                user_doc = db.collection("users").document(st.session_state.user_id).get()
 
+                if user_doc.exists:
+                    user_data = user_doc.to_dict()
+                    user_stress = user_data.get("stress_score", 50)
+                else:
+                    user_stress = 50
+
+                # Load relaxation engine with stress score
+                relaxation_engine.show(user_stress)
+
+            except Exception as e:
+                st.error(f"❌ Error loading page: {str(e)}")
+                import traceback
+                st.info(f"Details: {traceback.format_exc()}")
     except Exception as e:
         st.error(f"❌ Error loading page: {str(e)}")
         import traceback
         st.info(f"Details: {traceback.format_exc()}")
+ 
