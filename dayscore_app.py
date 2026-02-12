@@ -125,7 +125,7 @@ else:
         
         page = st.radio(
             "Select Page:",
-            ["🏠 Landing", "📝 Check-In", "📊 Results", "📈 Analytics", "🏆 Achievements", "🌬️ Breathing", "🎮 Games", "💡 Insights", "👤 Profile"],
+            ["🏠 Landing", "📝 Check-In", "📊 Results", "📈 Analytics", "🏆 Achievements", "🌬️ Breathing", "🎮 Games", "💡 Insights", "👤 Profile" , "💬 HealthBot"],
             key="page_nav",
             label_visibility="collapsed"
         )
@@ -170,6 +170,9 @@ else:
         elif "Profile" in page:
             from pages.profile import show
             show(db)
+        elif "HealthBot" in page:
+            from pages.chatbot import show
+            show(db)    
     except Exception as e:
         st.error(f"❌ Error loading page: {str(e)}")
         import traceback

@@ -333,3 +333,4 @@ def show(db):
         <p style='margin: 5px 0; font-weight: 500;'>DayScore+ © 2026 • Your mental health matters</p>
     </div>
     """, unsafe_allow_html=True)
+

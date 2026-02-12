@@ -12,7 +12,7 @@ except ImportError:
     pass
 
 # Initialize Gemini API
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyAl2EIGoXJ17AbMTCW898luI6DA9nobVOk")
 
 if USING_GENAI and GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)

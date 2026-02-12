@@ -1,24 +1,41 @@
 import streamlit as st
-
-import streamlit as st
+import random
+import time
 
 def show(db):
     st.title("🎮 Games")
 
-    """
-    LEVEL 4: Games & Breathing Experience
-    Relaxation-focused pages for stress relief
-    """
-    # Custom CSS with dark theme and animations
+    # -------------------------------
+    # Session State (Game Tracking)
+    # -------------------------------
+    if "active_game" not in st.session_state:
+        st.session_state.active_game = None
+
+    if "puzzle_numbers" not in st.session_state:
+        st.session_state.puzzle_numbers = random.sample(range(1, 9), 8) + [0]  # 0 = empty tile
+
+    if "garden_level" not in st.session_state:
+        st.session_state.garden_level = 0
+
+    if "cafe_score" not in st.session_state:
+        st.session_state.cafe_score = 0
+
+    if "memory_seq" not in st.session_state:
+        st.session_state.memory_seq = []
+
+    if "focus_score" not in st.session_state:
+        st.session_state.focus_score = 0
+
+    # -------------------------------
+    # CSS (Your Original UI)
+    # -------------------------------
     st.markdown("""
     <style>
-        /* Dark background */
         .main {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: #ffffff;
         }
-        
-        /* Header styling */
+
         .games-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 50px 30px;
@@ -30,112 +47,40 @@ def show(db):
             position: relative;
             overflow: hidden;
         }
-        
-        .games-header::before {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
-            z-index: 0;
-        }
-        
+
         .games-header h1 {
-            position: relative;
-            z-index: 1;
             font-weight: 800;
             font-size: 3.2em;
             margin: 0;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
         }
-        
+
         .games-header p {
-            position: relative;
-            z-index: 1;
             font-size: 1.4em;
             opacity: 0.95;
             margin-top: 15px;
             font-weight: 300;
         }
-        
-        /* Tab styling */
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 15px;
-            background: rgba(30, 41, 59, 0.6);
-            padding: 15px;
-            border-radius: 16px;
-            border: 1px solid rgba(100, 116, 139, 0.3);
-        }
-        
-        .stTabs [data-baseweb="tab"] {
-            height: 50px;
-            background: rgba(56, 70, 89, 0.4);
-            border-radius: 12px;
-            color: #cbd5e1;
-            font-weight: 600;
-            font-size: 1.1em;
-            padding: 0 25px;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-        
-        .stTabs [data-baseweb="tab"]:hover {
-            background: rgba(102, 126, 234, 0.2);
-            color: white;
-        }
-        
-        .stTabs [aria-selected="true"] {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white !important;
-            border-color: #667eea;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        /* Game card styling */
+
         .game-card {
             background: rgba(30, 41, 59, 0.7);
             border-radius: 18px;
             padding: 30px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-            transition: all 0.4s ease;
             border: 1px solid rgba(100, 116, 139, 0.3);
             height: 100%;
-            display: flex;
-            flex-direction: column;
         }
-        
-        .game-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.25);
-            border-color: rgba(102, 126, 234, 0.5);
-            background: rgba(30, 41, 59, 0.85);
-        }
-        
-        .game-card.puzzle {
-            border-top: 5px solid #667eea;
-        }
-        
-        .game-card.cozy {
-            border-top: 5px solid #f59e0b;
-        }
-        
-        .game-card.focus {
-            border-top: 5px solid #10b981;
-        }
-        
+
+        .game-card.puzzle { border-top: 5px solid #667eea; }
+        .game-card.cozy { border-top: 5px solid #f59e0b; }
+        .game-card.focus { border-top: 5px solid #10b981; }
+
         .game-icon {
             font-size: 3.5em;
             margin-bottom: 20px;
             display: flex;
             justify-content: center;
         }
-        
+
         .game-title {
             font-size: 1.6em;
             font-weight: 700;
@@ -143,38 +88,15 @@ def show(db):
             margin: 0 0 15px 0;
             text-align: center;
         }
-        
+
         .game-desc {
             font-size: 1.1em;
             color: #94a3b8;
             text-align: center;
             line-height: 1.6;
             margin-bottom: 25px;
-            flex-grow: 1;
         }
-        
-        /* Button styling */
-        .stButton > button {
-            width: 100%;
-            padding: 14px 25px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1.05em;
-            transition: all 0.3s ease;
-            border: none;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .stButton > button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        .stButton > button:active {
-            transform: translateY(1px);
-        }
-        
-        /* Coming soon banner */
+
         .coming-soon {
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
             border-left: 4px solid #667eea;
@@ -186,41 +108,12 @@ def show(db):
             font-weight: 500;
             text-align: center;
         }
-        
-        /* Section divider */
-        .section-divider {
-            height: 2px;
-            background: linear-gradient(to right, transparent, rgba(102, 126, 234, 0.5), transparent);
-            margin: 50px 0;
-            border-radius: 2px;
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .games-header h1 {
-                font-size: 2.4em;
-            }
-            .games-header p {
-                font-size: 1.15em;
-            }
-            .stTabs [data-baseweb="tab"] {
-                font-size: 0.95em;
-                padding: 0 15px;
-            }
-            .game-icon {
-                font-size: 2.8em;
-            }
-            .game-title {
-                font-size: 1.4em;
-            }
-            .game-desc {
-                font-size: 1em;
-            }
-        }
     </style>
     """, unsafe_allow_html=True)
 
+    # -------------------------------
     # Header
+    # -------------------------------
     st.markdown("""
     <div class="games-header">
         <h1>🎮 Relaxing Games</h1>
@@ -228,104 +121,292 @@ def show(db):
     </div>
     """, unsafe_allow_html=True)
 
-    # Coming soon banner
     st.markdown("""
     <div class="coming-soon">
-        🎮 <strong>Featured Games</strong> - Interactive experiences coming soon! Stay tuned for updates.
+        🎮 <strong>Featured Games</strong> - Play directly inside this page!
     </div>
     """, unsafe_allow_html=True)
 
-    # Game categories tabs
+    # -------------------------------
+    # Helper: Close Game
+    # -------------------------------
+    def close_game():
+        st.session_state.active_game = None
+
+    # -------------------------------
+    # Tabs
+    # -------------------------------
     tab1, tab2, tab3 = st.tabs(["🧩 Puzzles", "🎨 Cozy Games", "🎯 Focus Games"])
 
+    # ======================================================
+    # 🧩 TAB 1
+    # ======================================================
     with tab1:
-        st.markdown('<div style="color: #cbd5e1; font-size: 1.3em; margin-bottom: 30px;">🧩 Relaxing puzzle games to help you unwind and de-stress</div>', unsafe_allow_html=True)
-        
+        st.subheader("🧩 Relaxing Puzzle Games")
+
         col1, col2 = st.columns(2, gap="large")
-        
+
         with col1:
             st.markdown("""
             <div class="game-card puzzle">
                 <div class="game-icon">🧩</div>
                 <h3 class="game-title">Zen Puzzles</h3>
-                <p class="game-desc">Meditative puzzle experience with soothing visuals and calming music. Perfect for unwinding after study sessions.</p>
+                <p class="game-desc">Simple 3x3 sliding puzzle. Arrange tiles in correct order.</p>
             </div>
             """, unsafe_allow_html=True)
-            st.button("Play Now", key="zen_puzzles", use_container_width=True, type="primary")
-        
+
+            if st.button("Play Zen Puzzle", key="zen_puzzles"):
+                st.session_state.active_game = "zen_puzzle"
+
         with col2:
             st.markdown("""
             <div class="game-card puzzle">
                 <div class="game-icon">🌈</div>
                 <h3 class="game-title">Color Match</h3>
-                <p class="game-desc">Peaceful color matching game that helps improve focus while keeping your mind relaxed. Beautiful gradients and smooth animations.</p>
+                <p class="game-desc">Guess the correct color quickly. Improve focus & speed.</p>
             </div>
             """, unsafe_allow_html=True)
-            st.button("Play Now", key="color_match", use_container_width=True, type="primary")
 
+            if st.button("Play Color Match", key="color_match"):
+                st.session_state.active_game = "color_match"
+
+        # -------------------------------
+        # Zen Puzzle Game
+        # -------------------------------
+        if st.session_state.active_game == "zen_puzzle":
+            st.markdown("## 🧩 Zen Puzzle (3x3)")
+
+            st.info("Goal: Arrange tiles from 1 → 8. 0 means empty space.")
+
+            grid = st.session_state.puzzle_numbers
+
+            cols = st.columns(3)
+            for i in range(9):
+                val = grid[i]
+                label = "⬜" if val == 0 else str(val)
+
+                with cols[i % 3]:
+                    if st.button(label, key=f"tile_{i}"):
+                        empty_index = grid.index(0)
+
+                        # Valid moves: left right up down
+                        valid_moves = []
+                        if empty_index - 1 >= 0 and empty_index % 3 != 0:
+                            valid_moves.append(empty_index - 1)
+                        if empty_index + 1 < 9 and empty_index % 3 != 2:
+                            valid_moves.append(empty_index + 1)
+                        if empty_index - 3 >= 0:
+                            valid_moves.append(empty_index - 3)
+                        if empty_index + 3 < 9:
+                            valid_moves.append(empty_index + 3)
+
+                        if i in valid_moves:
+                            grid[empty_index], grid[i] = grid[i], grid[empty_index]
+                            st.session_state.puzzle_numbers = grid
+                            st.rerun()
+
+            if grid == [1, 2, 3, 4, 5, 6, 7, 8, 0]:
+                st.success("🎉 Puzzle Solved! Amazing focus 😄")
+
+            colA, colB = st.columns(2)
+            with colA:
+                if st.button("🔄 Reset Puzzle"):
+                    st.session_state.puzzle_numbers = random.sample(range(1, 9), 8) + [0]
+                    st.rerun()
+            with colB:
+                if st.button("❌ Exit Game"):
+                    close_game()
+                    st.rerun()
+
+        # -------------------------------
+        # Color Match Game
+        # -------------------------------
+        if st.session_state.active_game == "color_match":
+            st.markdown("## 🌈 Color Match Game")
+
+            colors = ["Red", "Blue", "Green", "Yellow", "Purple", "Orange"]
+            correct = random.choice(colors)
+
+            st.write("🎯 Select the correct color:")
+            st.markdown(f"### 👉 {correct}")
+
+            options = random.sample(colors, 4)
+            if correct not in options:
+                options[random.randint(0, 3)] = correct
+            random.shuffle(options)
+
+            choice = st.radio("Choose:", options, key="color_choice")
+
+            if st.button("Submit Answer"):
+                if choice == correct:
+                    st.success("✅ Correct! +1 Score")
+                else:
+                    st.error("❌ Wrong! Try again 😄")
+
+            if st.button("❌ Exit Game"):
+                close_game()
+                st.rerun()
+
+    # ======================================================
+    # 🎨 TAB 2
+    # ======================================================
     with tab2:
-        st.markdown('<div style="color: #cbd5e1; font-size: 1.3em; margin-bottom: 30px;">🎨 Comfortable, low-pressure gaming experiences for ultimate relaxation</div>', unsafe_allow_html=True)
-        
+        st.subheader("🎨 Cozy Games")
+
         col1, col2 = st.columns(2, gap="large")
-        
+
         with col1:
             st.markdown("""
             <div class="game-card cozy">
                 <div class="game-icon">🌸</div>
                 <h3 class="game-title">Garden Sim</h3>
-                <p class="game-desc">Grow your virtual garden at your own pace. Plant flowers, tend to plants, and create your peaceful sanctuary. No time limits or pressure.</p>
+                <p class="game-desc">Water your plant and watch it grow 🌱</p>
             </div>
             """, unsafe_allow_html=True)
-            st.button("Play Now", key="garden_sim", use_container_width=True, type="primary")
-        
+
+            if st.button("Play Garden Sim", key="garden_sim"):
+                st.session_state.active_game = "garden_sim"
+
         with col2:
             st.markdown("""
             <div class="game-card cozy">
                 <div class="game-icon">☕</div>
                 <h3 class="game-title">Café Manager</h3>
-                <p class="game-desc">Run a cozy virtual café where you can serve customers, decorate your space, and create the perfect relaxing atmosphere. Stress-free gameplay.</p>
+                <p class="game-desc">Serve customers and earn points ☕</p>
             </div>
             """, unsafe_allow_html=True)
-            st.button("Play Now", key="cafe_manager", use_container_width=True, type="primary")
 
+            if st.button("Play Café Manager", key="cafe_manager"):
+                st.session_state.active_game = "cafe_manager"
+
+        # Garden Sim
+        if st.session_state.active_game == "garden_sim":
+            st.markdown("## 🌸 Garden Sim")
+
+            st.progress(st.session_state.garden_level / 10)
+
+            st.write(f"🌱 Plant Growth Level: **{st.session_state.garden_level}/10**")
+
+            if st.button("💧 Water Plant"):
+                if st.session_state.garden_level < 10:
+                    st.session_state.garden_level += 1
+                st.rerun()
+
+            if st.session_state.garden_level == 10:
+                st.success("🌷 Your plant fully grew! Relaxing win 😍")
+
+            colA, colB = st.columns(2)
+            with colA:
+                if st.button("🔄 Reset Garden"):
+                    st.session_state.garden_level = 0
+                    st.rerun()
+            with colB:
+                if st.button("❌ Exit Game"):
+                    close_game()
+                    st.rerun()
+
+        # Cafe Manager
+        if st.session_state.active_game == "cafe_manager":
+            st.markdown("## ☕ Café Manager")
+
+            st.write(f"⭐ Your Score: **{st.session_state.cafe_score}**")
+
+            customer = random.choice(["👩 Customer wants Latte", "👨 Customer wants Cappuccino", "🧑 Customer wants Espresso"])
+
+            st.info(customer)
+
+            if st.button("☕ Serve"):
+                st.session_state.cafe_score += 1
+                st.success("Served! +1 ⭐")
+                st.rerun()
+
+            colA, colB = st.columns(2)
+            with colA:
+                if st.button("🔄 Reset Café"):
+                    st.session_state.cafe_score = 0
+                    st.rerun()
+            with colB:
+                if st.button("❌ Exit Game"):
+                    close_game()
+                    st.rerun()
+
+    # ======================================================
+    # 🎯 TAB 3
+    # ======================================================
     with tab3:
-        st.markdown('<div style="color: #cbd5e1; font-size: 1.3em; margin-bottom: 30px;">🎯 Games designed to improve concentration and mental clarity</div>', unsafe_allow_html=True)
-        
+        st.subheader("🎯 Focus Games")
+
         col1, col2 = st.columns(2, gap="large")
-        
+
         with col1:
             st.markdown("""
             <div class="game-card focus">
                 <div class="game-icon">🧠</div>
                 <h3 class="game-title">Memory Master</h3>
-                <p class="game-desc">Enhance your memory skills with progressively challenging levels. Track your improvement over time and unlock new brain-training exercises.</p>
+                <p class="game-desc">Remember the numbers and type them back.</p>
             </div>
             """, unsafe_allow_html=True)
-            st.button("Play Now", key="memory_master", use_container_width=True, type="primary")
-        
+
+            if st.button("Play Memory Master", key="memory_master"):
+                st.session_state.active_game = "memory_master"
+
         with col2:
             st.markdown("""
             <div class="game-card focus">
                 <div class="game-icon">🎯</div>
                 <h3 class="game-title">Focus Quest</h3>
-                <p class="game-desc">Improve concentration and focus through engaging mini-games. Perfect for study breaks or building mental stamina before exams.</p>
+                <p class="game-desc">30-second focus timer. Stay calm & win.</p>
             </div>
             """, unsafe_allow_html=True)
-            st.button("Play Now", key="focus_quest", use_container_width=True, type="primary")
 
-    # Divider
-    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+            if st.button("Play Focus Quest", key="focus_quest"):
+                st.session_state.active_game = "focus_quest"
 
-    # Final info banner
-    st.markdown("""
-    <div class="coming-soon" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%); border-left-color: #10b981;">
-        💡 <strong>Pro Tip:</strong> Take 5-minute game breaks between study sessions to refresh your mind and improve productivity!
-    </div>
-    """, unsafe_allow_html=True)
+        # Memory Master
+        if st.session_state.active_game == "memory_master":
+            st.markdown("## 🧠 Memory Master")
 
-    # Footer
-    st.markdown("""
-    <div style="text-align: center; margin-top: 40px; padding: 25px; color: #64748b; font-size: 0.95em;">
-        <p>Games update monthly • Designed for student wellness • Zero ads, zero pressure</p>
-    </div>
-    """, unsafe_allow_html=True)
+            if st.button("Generate New Sequence"):
+                st.session_state.memory_seq = [random.randint(1, 9) for _ in range(5)]
+
+            if st.session_state.memory_seq:
+                st.warning(f"Memorize this: {st.session_state.memory_seq}")
+                user_input = st.text_input("Enter sequence (space separated):")
+
+                if st.button("Check"):
+                    try:
+                        nums = list(map(int, user_input.split()))
+                        if nums == st.session_state.memory_seq:
+                            st.success("🎉 Perfect Memory!")
+                        else:
+                            st.error("❌ Wrong. Try again!")
+                    except:
+                        st.error("Enter numbers properly like: 1 2 3 4 5")
+
+            if st.button("❌ Exit Game"):
+                close_game()
+                st.rerun()
+
+        # Focus Quest
+        if st.session_state.active_game == "focus_quest":
+            st.markdown("## 🎯 Focus Quest")
+
+            st.write("Click start and stay focused for 10 seconds 😄")
+
+            if st.button("Start Timer"):
+                st.write("⏳ Focusing...")
+                time.sleep(10)
+                st.session_state.focus_score += 1
+                st.success("✅ You stayed focused! +1 Score")
+
+            st.write(f"🏆 Focus Score: **{st.session_state.focus_score}**")
+
+            colA, colB = st.columns(2)
+            with colA:
+                if st.button("🔄 Reset Score"):
+                    st.session_state.focus_score = 0
+                    st.rerun()
+            with colB:
+                if st.button("❌ Exit Game"):
+                    close_game()
+                    st.rerun()
